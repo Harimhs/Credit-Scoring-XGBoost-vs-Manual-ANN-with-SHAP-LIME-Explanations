@@ -1,6 +1,6 @@
 ***
 
-# Credit Risk Modeling with XGBoost, SHAP, and LIME
+# Credit Risk Modeling with XGBoost, Random Forest, SHAP, and LIME
 
 **Interpretable Machine Learning for Credit Risk Modeling using SHAP and LIME**
 
@@ -8,7 +8,7 @@
 
 ## Executive Summary
 
-This project builds and explains a credit risk model on the German Credit dataset, guiding a bank in predicting loan defaults and interpreting model decisions for regulatory transparency. We preprocess the data, engineer business-smart features (plus a KMeans risk segment), and compare XGBoost (ensemble) with a custom-built neural network. For interpretability, we apply SHAP (global \& local feature impact) and LIME (local surrogate explanations) to rigorously explain both global behaviors and individual customer decisions.
+This project builds and explains a credit risk model on the German Credit dataset, guiding a bank in predicting loan defaults and interpreting model decisions for regulatory transparency. We preprocess the data, engineer business-smart features (plus a KMeans risk segment), and compare XGBoost (ensemble) with Random Forest. For interpretability, we apply SHAP (global \& local feature impact) and LIME (local surrogate explanations) to rigorously explain both global behaviors and individual customer decisions.
 
 ***
 
@@ -66,25 +66,22 @@ This project builds and explains a credit risk model on the German Credit datase
 
 - **Train/Test Split**: 80:20 stratified (preserve 70:30 class ratio).
 - **SMOTE**: Balances training data for XGBoost (ensures bad-risk learning).
-- **Scaling**: All features scaled using log1p and then standardized (both tree-based and neural models receive robust, stable input).
-
+- **Scaling**: All features scaled using standardized 
 ***
 
 ### 5. **Model Selection \& Evaluation**
 
-- **Model 1: XGBoost (primary)**
-    - 400 trees, depth=4, tuned gamma/reg_lambda, 0.1 learning rate.
-    - Early stopping, test set used for validation.
-    - Best threshold lowered to 0.35, maximizing recall (capture more bad risks!).
-    - Metrics:
-        - Accuracy: **0.80**
-        - ROC-AUC: **0.81**
-        - Recall (bad risk): **0.93** (regulatory requirement: prioritize not missing defaults)
-        - Macro F1-score: **0.73**
-- **Model 2: Manual ANN**
-    - 2 hidden layers, ReLU activations.
-    - Stable learning with log + z-score scaling.
-    - Test ROC-AUC: **0.79**, Accuracy: **0.76**
+- **Modeling \& Selection**
+    - **XGBoost**: Chosen for strong ROC-AUC, handling of categorical/outlier features, and regulatory-auditable interpretability.
+    - **Random Forest (inbuilt)**: Baseline ensemble, robust for tabular data, and strong industry adoption.
+***
+
+## Key Results (Test Data)
+
+| Model | Accuracy | ROC-AUC | Precision (bad) | Recall (bad) | F1 (bad) |
+| :-- | :-- | :-- | :-- | :-- | :-- |
+| XGBoost | 0.80 | 0.81 | 0.74 | 0.49 | 0.59 |
+| Random Forest | 0.77 | 0.79 | 0.62 | 0.53 | 0.57 |
 
 **Model Selection Justification:**
 XGBoost outperforms on both global metrics and regulatory-relevant recall. Additionally, its compatibility with SHAP allows the most rigorous post-hoc interpretability for risk disclosure.
@@ -156,10 +153,11 @@ XGBoost outperforms on both global metrics and regulatory-relevant recall. Addit
 
 ***
 
-### 11. **Conclusion**
+## Business \& Regulatory Summary
 
-This pipeline delivers both state-of-the-art predictive accuracy (ROC-AUC > 0.8) and transparent, stakeholder-ready explanations for credit risk. All analytical and modeling choices are justified by domain knowledge and regulatory best practice. The interpretability strategy (SHAP + LIME) ensures every prediction is explainable to non-technical stakeholders and auditors. The overall approach can be deployed, audited, and maintained robustly in a bank credit risk setting.
+- **XGBoost with SHAP explanations is ideal for bank risk committees**, capturing both accuracy and transparency.
+- **Random Forest provides an auditable backup/secondary model**—nearly as strong and very interpretable for tabular features.
+- **SHAP \& LIME explanations show that risk is most driven by monthly repayment capacity, saving/checking account status, and hidden customer micro-segments** (detected by KMeans—an innovation!).
+- **All steps, from EDA to deployment, are clearly documented for both technical and non-technical review.**
 
 ***
-
-
